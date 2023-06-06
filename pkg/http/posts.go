@@ -43,14 +43,12 @@ func (h *PostHandler) Create(c *gin.Context) {
 		return
 	}
 
-	err := h.PostService.Create(&post)
-	if err != nil {
+	if err := h.PostService.Create(&post); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"Error creating post": err.Error(),
 		})
 		return
 	}
-
 	c.JSON(http.StatusCreated, post)
 }
 
@@ -61,14 +59,12 @@ func (h *PostHandler) Delete(c *gin.Context) {
 		fmt.Fprintln(os.Stderr, "Error parsing int")
 		return
 	}
-	_, err = h.PostService.Get(id)
-	if err != nil {
+	if _, err = h.PostService.Get(id); err != nil {
 		fmt.Println(fmt.Errorf("Post not found: %v", err))
 		c.JSON(http.StatusNotFound, gin.H{"message": "post not found"})
 		return
 	}
-	err = h.PostService.Delete(id)
-	if err != nil {
+	if err = h.PostService.Delete(id); err != nil {
 		fmt.Println(fmt.Errorf("Error deleting post: %v", err))
 		return
 	}

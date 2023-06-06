@@ -20,12 +20,16 @@ func main() {
 
 	ps := &postgres.PostService{DB: db}
 	us := &postgres.UserService{DB: db}
+
 	var ph http.PostHandler
 	var uh http.UserHandler
 	ph.PostService = ps
 	uh.UserService = us
+
 	router := gin.Default()
+
 	http.PostRoutes(router, &ph)
 	http.UserRoutes(router, &uh)
+
 	router.Run()
 }
