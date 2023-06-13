@@ -6,6 +6,7 @@ import (
 	"os"
 	"strconv"
 
+	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"github.com/lexunix/goapp/pkg/domain"
 )
@@ -24,6 +25,8 @@ func (h *PostHandler) Get(c *gin.Context) {
 		})
 		return
 	}
+	session := sessions.Default(c)
+	session.Get("id")
 	post, err := h.PostService.Get(id)
 	if err != nil {
 		fmt.Println(fmt.Errorf("Error finding post: %v", err))
@@ -69,4 +72,22 @@ func (h *PostHandler) Delete(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusNoContent, gin.H{"message": "post deleted"})
+}
+
+func (h *PostHandler) UserPosts(c *gin.Context) {
+	session := sessions.Default(c)
+	v := session.Get("id")
+
+	userID, ok := v.(int64)
+	if !ok {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "session is empty"})
+		return
+	}
+
+	posts, err := h.PostService.UserPosts(userID)
+	if err != nil {
+		c.JSON(http.StatusNoContent, gin.H{"message": "cannot parse session key to int"})
+		return
+	}
+	c.JSON(http.StatusOK, posts)
 }

@@ -11,4 +11,5 @@ type UserService interface {
 	Get(id int64) (*User, error)
 	Create(u *User) error
 	Delete(id int64) error
+	User(username string) (*User, error)
 }

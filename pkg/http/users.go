@@ -5,7 +5,9 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
+	"github.com/jackc/pgx/v5"
 	"github.com/lexunix/goapp/pkg/domain"
 )
 
@@ -30,6 +32,47 @@ func (h *UserHandler) GetById(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, user)
+}
+
+func (h UserHandler) Login(c *gin.Context) {
+	var user domain.User
+
+	if err := c.ShouldBindJSON(&user); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "Unable to parse JSON",
+		})
+	}
+
+	existingUser, err := h.UserService.User(user.Username)
+
+	if err != nil {
+		if err != pgx.ErrNoRows {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"message": "User not found",
+			})
+
+		} else {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"message": "Error finding user",
+			})
+		}
+		return
+	}
+
+	if user.Password != existingUser.Password {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "Passwords don't match",
+		})
+		return
+
+	}
+
+	session := sessions.Default(c)
+	session.Set("id", existingUser.ID)
+	session.Save()
+	c.JSON(http.StatusOK, gin.H{
+		"message": "signed in",
+	})
 }
 
 func (h *UserHandler) CreateUser(c *gin.Context) {
