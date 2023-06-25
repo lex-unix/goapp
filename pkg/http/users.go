@@ -8,6 +8,7 @@ import (
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v5"
+	"github.com/lexunix/goapp/pkg/argon2"
 	"github.com/lexunix/goapp/pkg/domain"
 )
 
@@ -59,12 +60,19 @@ func (h UserHandler) Login(c *gin.Context) {
 		return
 	}
 
-	if user.Password != existingUser.Password {
+	passwordMatch, err := argon2.ValidateHash(user.Password, existingUser.Password)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "Can't validate passwords",
+		})
+		return
+	}
+
+	if !passwordMatch {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "Passwords don't match",
 		})
 		return
-
 	}
 
 	session := sessions.Default(c)
@@ -83,6 +91,15 @@ func (h *UserHandler) CreateUser(c *gin.Context) {
 		})
 		return
 	}
+	hash, err := argon2.HashPassword(user.Password)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": err,
+		})
+		return
+
+	}
+	user.Password = hash
 	if err := h.UserService.Create(&user); err != nil {
 		fmt.Println(fmt.Errorf("Error saving user: %v", err))
 		c.JSON(http.StatusInternalServerError, gin.H{
