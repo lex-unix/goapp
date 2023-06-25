@@ -6,6 +6,6 @@ Trying to follow the [Standard Package Layout](https://www.gobeyond.dev/standard
 
 ## TODO
 
-- [ ] Passowrd Hashing
+-   [x] Passowrd Hashing
 - [x] Authentication
 - [ ] Swap pgx with [sqlx](https://github.com/jmoiron/sqlx)
