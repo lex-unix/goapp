@@ -86,7 +86,7 @@ func (h *PostHandler) UserPosts(c *gin.Context) {
 
 	posts, err := h.PostService.UserPosts(userID)
 	if err != nil {
-		c.JSON(http.StatusNoContent, gin.H{"message": "cannot parse session key to int"})
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "cannot parse session key to int"})
 		return
 	}
 	c.JSON(http.StatusOK, posts)
