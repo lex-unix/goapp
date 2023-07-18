@@ -1,27 +1,30 @@
 package main
 
 import (
-	"context"
+	"fmt"
 	"log"
 	"os"
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/redis"
 	"github.com/gin-gonic/gin"
-	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/jmoiron/sqlx"
+	"github.com/lexunix/goapp/pkg/database"
 	"github.com/lexunix/goapp/pkg/http"
-	"github.com/lexunix/goapp/pkg/postgres"
+	_ "github.com/lib/pq"
 )
 
 func main() {
-	db, err := pgxpool.New(context.Background(), os.Getenv("DATABASE_URL"))
+	conn := os.Getenv("DATABASE_URL")
+	fmt.Println(conn)
+	db, err := sqlx.Connect("postgres", os.Getenv("DATABASE_URL"))
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer db.Close()
 
-	ps := &postgres.PostService{DB: db}
-	us := &postgres.UserService{DB: db}
+	ps := &database.PostService{DB: db}
+	us := &database.UserService{DB: db}
 
 	var ph http.PostHandler
 	var uh http.UserHandler

@@ -7,7 +7,6 @@ import (
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
-	"github.com/jackc/pgx/v5"
 	"github.com/lexunix/goapp/pkg/argon2"
 	"github.com/lexunix/goapp/pkg/domain"
 )
@@ -47,16 +46,9 @@ func (h UserHandler) Login(c *gin.Context) {
 	existingUser, err := h.UserService.User(user.Username)
 
 	if err != nil {
-		if err != pgx.ErrNoRows {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"message": "User not found",
-			})
-
-		} else {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"message": "Error finding user",
-			})
-		}
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "Error finding user",
+		})
 		return
 	}
 
