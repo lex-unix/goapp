@@ -11,6 +11,16 @@ type PostService struct {
 	DB *sqlx.DB
 }
 
+func (s *PostService) All() (*[]domain.Post, error) {
+	posts := []domain.Post{}
+	err := s.DB.Select(&posts, "SELECT * FROM Post")
+	if err != nil {
+		return nil, err
+	}
+	return &posts, nil
+
+}
+
 func (s *PostService) Get(id int64) (*domain.Post, error) {
 	var p domain.Post
 	if err := s.DB.Get(&p, "SELECT * FROM Post WHERE id = $1", id); err != nil {

@@ -15,7 +15,20 @@ type PostHandler struct {
 	PostService domain.PostService
 }
 
-func (h *PostHandler) Get(c *gin.Context) {
+func (h *PostHandler) GetAll(c *gin.Context) {
+	posts, err := h.PostService.All()
+	fmt.Println(c.Cookie("cook-my-sess"))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, posts)
+}
+
+func (h *PostHandler) GetOne(c *gin.Context) {
 	param := c.Param("id")
 	id, err := strconv.ParseInt(param, 10, 64)
 	if err != nil {
