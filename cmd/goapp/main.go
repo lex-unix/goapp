@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/redis"
 	"github.com/gin-gonic/gin"
@@ -38,7 +39,13 @@ func main() {
 		log.Fatal(err)
 	}
 	redis.SetKeyPrefix(store, "mysession:")
+
+	config := cors.DefaultConfig()
+	config.AllowOrigins = []string{"http://localhost:5173/"}
+	config.AllowCredentials = true
+
 	router.Use(sessions.Sessions("cook-my-sess", store))
+	router.Use(cors.New(config))
 
 	http.PostRoutes(router, &ph)
 	http.UserRoutes(router, &uh)
