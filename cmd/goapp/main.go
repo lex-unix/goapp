@@ -41,7 +41,7 @@ func main() {
 	redis.SetKeyPrefix(store, "mysession:")
 
 	config := cors.DefaultConfig()
-	config.AllowOrigins = []string{"http://localhost:5173/"}
+	config.AllowOrigins = []string{"http://localhost:5173"}
 	config.AllowCredentials = true
 
 	router.Use(sessions.Sessions("cook-my-sess", store))
