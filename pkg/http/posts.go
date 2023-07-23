@@ -59,6 +59,18 @@ func (h *PostHandler) Create(c *gin.Context) {
 		return
 	}
 
+	session := sessions.Default(c)
+	v := session.Get("id")
+
+	userID, ok := v.(int64)
+
+	if !ok {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "session is empty"})
+		return
+	}
+
+	post.UserID = userID
+
 	if err := h.PostService.Create(&post); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"Error creating post": err.Error(),
